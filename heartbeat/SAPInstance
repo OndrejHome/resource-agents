@@ -763,6 +763,17 @@ sapinstance_validate() {
     rc=$OCF_ERR_ARGS
   fi
 
+  if [ ! -z "$OCF_RESKEY_ERS_InstanceName" ]
+  then
+    ASCS_instance_number=$(echo "$OCF_RESKEY_InstanceName"| cut -d_ -f2|sed 's/.*\([0-9][0-9]\)$/\1/')
+    ERS_instance_number=$(echo "$OCF_RESKEY_ERS_InstanceName"| cut -d_ -f2|sed 's/.*\([0-9][0-9]\)$/\1/')
+    if [ "$ASCS_instance_number" = "$ERS_instance_number" ]
+    then
+      ocf_log err "Master Instance number ($ASCS_instance_number) and ERS Instance number ($ERS_instance_number) cannot be same!"
+      rc=$OCF_ERR_ARGS
+    fi
+  fi
+
   return $rc
 }
 
