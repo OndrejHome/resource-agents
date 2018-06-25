@@ -950,6 +950,33 @@ is_clone; CLONE=$?
 if [ ${CLONE} -eq 1 ]
 then
   CLACT=_clone
+
+  ####  check if the ASCS profile contains 'Start_Program_01' string
+  # https://access.redhat.com/articles/3150081#ascs-profile-modification
+
+  # first determine location of the ASCS profile
+  if [ ! -z "$OCF_RESKEY_START_PROFILE" ]; then
+    ASCSprofile=$OCF_RESKEY_START_PROFILE
+  else
+    SAPVIRHOST=`echo "$OCF_RESKEY_InstanceName" | cut -d_ -f3`
+    SID=`echo "$OCF_RESKEY_InstanceName" | cut -d_ -f1`
+    InstanceName=`echo "$OCF_RESKEY_InstanceName" | cut -d_ -f2`
+
+    if [ -z "$OCF_RESKEY_DIR_PROFILE" ]
+    then
+      DIR_PROFILE="/usr/sap/$SID/SYS/profile"
+    else
+      DIR_PROFILE="$OCF_RESKEY_DIR_PROFILE"
+    fi
+
+    ASCSprofile=$DIR_PROFILE/START_${InstanceName}_${SAPVIRHOST}
+  fi
+  # then verify the presence of the string
+  egrep -q '^\s*Start_Program_01' $ASCSprofile; rc=$?
+  if [ "$rc" != '0' ]; then
+    ocf_log err "ASCS profile is missing 'Start_Program_01' variable."
+    exit $OCF_ERR_ARGS
+  fi
 else
   if [ "$ACTION" = "promote" -o "$ACTION" = "demote" ]
   then
