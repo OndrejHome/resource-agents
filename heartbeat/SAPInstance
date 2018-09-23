@@ -446,7 +446,7 @@ check_sapstartsrv() {
     then
       DIR_PROFILE="/usr/sap/$SID/SYS/profile"
     else
-      abnormal_end "Expected /usr/sap/$SID/SYS/profile/ to be a directory, please set DIR_PROFILE parameter!"
+      abnormal_end "Make sure that /usr/sap/$SID/SYS/profile/ is a directory and that it contains start profile for this SAP Instance!"
     fi
 
     [ ! -r $SAPSTARTPROFILE ] && abnormal_end "Expected $SAPSTARTPROFILE to be the instance START profile, please set START_PROFILE parameter!"
